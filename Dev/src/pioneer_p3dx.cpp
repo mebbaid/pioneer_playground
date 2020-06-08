@@ -101,9 +101,41 @@ bool pioneer_p3dx::update_tfl() {
 		return false;
 	}
 	m_alpha[0] = (m_robotPosition[0]*m_robotPosition[0]) + (m_robotPosition[1]*m_robotPosition[1]) - 2 ;
-	m_alpha[1] = 2 * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2])) ;
+	m_alpha[1] = 2 * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2])) ; // TODO make sure const u1 corresponds to this derivative
 	return true;
 }
+
+
+bool pioneer_p3dx::update_dtfl() {
+
+	if (simxGetObjectPosition(m_clientID, m_robotHandle, -1, m_robotPosition, simx_opmode_buffer) != simx_return_ok) {
+		std::cout << "[UPDATE] robot position not retireved" << std::endl;
+		return false;
+	}
+	if (simxGetObjectOrientation(m_clientID, m_robotHandle, -1, m_robotOrientation, simx_opmode_buffer) != simx_return_ok) {
+		std::cout << "[UPDATE] robot orientation not retireved" << std::endl;
+		return false;
+	}
+	if (simxGetObjectPosition(m_clientID, m_pathHandle, -1, m_pathPosition, simx_opmode_buffer) != simx_return_ok) {
+		std::cout << "[UPDATE] path position not retireved" << std::endl;
+		return false;
+	}
+	simxGetObjectVelocity(m_clientID, m_robotHandle, m_robotlinVelocity, m_robotAngVelocity, simx_opmode_oneshot_wait);
+	m_zeta     = m_robotlinVelocity[0]*cos(m_robotOrientation[2]) +	m_robotlinVelocity[1]*sin(m_robotOrientation[2]) ; // TODO test if this takes the previous value of v
+	m_alpha[0] = (m_robotPosition[0]*m_robotPosition[0]) + (m_robotPosition[1]*m_robotPosition[1]) - 2 ;
+	m_alpha[1] = 2 * m_zeta * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2])) ;
+	m_pi[0] = atan2(m_robotPosition[1],m_robotPosition[0]) ; 
+ 	m_pi[1] = (- m_zeta *(m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin( m_robotOrientation[2])))/(m_robotPosition[0]*m_robotPosition[0]) + (m_robotPosition[1]*m_robotPosition[1]) ;
+	m_Di[0][0] = (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2]))/m_zeta ;
+	m_Di[0][1] = (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin( m_robotOrientation[2]))/(2*m_zeta*(m_alpha[0] + 2)) ;
+	m_Di[1][0] = m_robotPosition[0] * sin(m_robotOrientation[2]) - m_robotPosition[1] * cos( m_robotOrientation[2]) ;
+	m_Di[1][1] = (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2]))/(2*(m_alpha[0] + 2)) ;
+	m_lf2[0] = 2 * m_zeta * m_zeta ;
+	m_lf2[1] = (m_lf2[0] * ((pow(m_robotPosition[1],2)*sin(2*m_robotOrientation[2])))/2 + m_robotPosition[0]*m_robotPosition[1]*cos(2*m_robotOrientation[2]) - ((pow(m_robotPosition[0],2)*sin(2*m_robotOrientation[2])))/2)/(m_alpha[0] + 2) ;
+	
+	return true;
+}
+
 
 float* pioneer_p3dx::controlTx(float u1, float u2, const float b) {
 	float m_theta = m_robotOrientation[2];
@@ -119,6 +151,17 @@ float* pioneer_p3dx::controlTx(float u1, float u2, const float b) {
 }
 
 float* pioneer_p3dx::controlTx_tfl(float u1, float u2) {
+	float m_theta = m_robotOrientation[2];
+	float v = u1;
+	float w = u2 ;
+	const float l = 0.35, r = 0.1;
+	m_control[0] = (v + 0.5*l*w)/r; // l = 0.35 is the distance between the wheels, r is radius
+	m_control[1] = (v - 0.5*l*w)/r;
+
+	return m_control;
+}
+
+float* pioneer_p3dx::controlTx_dtfl(float u1, float u2) {
 	float m_theta = m_robotOrientation[2];
 	float v = u1;
 	float w = u2 ;

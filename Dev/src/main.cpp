@@ -23,7 +23,7 @@ int main()
     std::cout << "Hello World!\n";
     float * control;
     float* states;
-    float u1, u2;   //initial controls
+    float u1, u2, v1, v2;   //initial controls
     time_t  simTime;
     float b,  k1 = 2, k2 = 3 ;
     float e1[2] ; 
@@ -68,7 +68,22 @@ int main()
 			break ;
 
 			case DTFL: { 
-			 std::cout << "Not implemented yet" << std::endl;	
+			  std::cout << "Simulating DTFL over a circle" << std::endl;	
+			  while (timeLeft > 0 )
+				   {
+				    time_t end = time(0);
+				    time_t timeTaken = end - start;
+				    myPioneer.update_dtfl();
+				    v1 = -k2 * myPioneer.m_alpha[0] - k1 * myPioneer.m_alpha[1];
+				    v2 = -k1 * (myPioneer.m_pi[1]-0.2); // assign a velocity on the path
+				    u1 = myPioneer.m_Di[0][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[0][1]	* (v2 - myPioneer.m_lf2[1]) ; 
+				    u1 = myPioneer.m_Di[1][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[1][1]	* (v2 - myPioneer.m_lf2[1]) ;  
+				    control = myPioneer.controlTx_dtfl(u1,u2);
+				    myPioneer.move(*(control), *(control+1));
+				    timeLeft = simTime - timeTaken ;
+				    simxSynchronousTrigger(myPioneer.m_clientID);	
+			 	   }
+			  	myPioneer.close();	    
 			} 
 			break ;
 
