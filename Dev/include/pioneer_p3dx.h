@@ -31,7 +31,7 @@ public:
 
 
 	bool configure();	// establish the connection and retrieve handles
-	bool update(const float b);		// main function updating robot state
+	bool update_fblinearization(const float b);		// main function updating robot state
 	simxFloat* controlTx(float u1, float u2, const float b);  // To convert (u,w) -> (u1,u2)
 	bool move(simxFloat m_desiredrightvelocity, simxFloat m_desiredleftvelocity);
 	//float* statesTx(float b, float x, float y, float theta);

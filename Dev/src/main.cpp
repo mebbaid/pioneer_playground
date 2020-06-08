@@ -29,7 +29,7 @@ int main()
         {
             time_t end = time(0);
             time_t timeTaken = end - start;
-            myPioneer.update(b);
+            myPioneer.update_fblinearization(b);
             e1[0] =  myPioneer.m_robotPosition[0] - myPioneer.m_pathPosition[0] ;
             e1[1] =  myPioneer.m_robotPosition[1] - myPioneer.m_pathPosition[1] ;
             u1 = k1*(myPioneer.m_pathlinVelocity[0] - myPioneer.m_robotlinVelocity[0]) - k1 * e1[0];

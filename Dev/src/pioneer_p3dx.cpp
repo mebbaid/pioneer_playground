@@ -63,7 +63,7 @@ bool pioneer_p3dx::configure() {
 	return true;
 }
 // TODO update module
-bool pioneer_p3dx::update(const float b) {
+bool pioneer_p3dx::update_fblinearization(const float b) {
 
 	if (simxGetObjectPosition(m_clientID, m_robotHandle, -1, m_robotPosition, simx_opmode_buffer) != simx_return_ok) {
 		std::cout << "[UPDATE] robot position not retireved" << std::endl;
