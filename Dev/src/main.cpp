@@ -9,12 +9,14 @@
 enum string_code {
 	    TFL,
 	    DTFL,
+	    FL,
 };
 
 
 string_code hashit (std::string const& inString) {
 	    if (inString == "TFL") return TFL;
 	    if (inString == "DTFL") return DTFL;
+	    if (inString == "FL") return FL;
 }
 
 int main()
@@ -87,11 +89,13 @@ int main()
 			} 
 			break ;
 
-			default : {
+			case : FL {
 			  while (timeLeft > 0 )
 				   {
 				    time_t end = time(0);
 				    time_t timeTaken = end - start;
+				    std::cout << "Please insert b [suggestion 0.2]" << std::endl;
+				    std::cin >> b ;
 				    myPioneer.update_fblinearization(b);
 				    e1[0] =  myPioneer.m_robotPosition[0] - myPioneer.m_pathPosition[0] ;
 				    e1[1] =  myPioneer.m_robotPosition[1] - myPioneer.m_pathPosition[1] ;

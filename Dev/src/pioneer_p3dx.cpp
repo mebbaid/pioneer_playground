@@ -130,6 +130,7 @@ bool pioneer_p3dx::update_dtfl() {
 	m_Di[0][1] = (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin( m_robotOrientation[2]))/(2*m_zeta*(m_alpha[0] + 2)) ;
 	m_Di[1][0] = m_robotPosition[0] * sin(m_robotOrientation[2]) - m_robotPosition[1] * cos( m_robotOrientation[2]) ;
 	m_Di[1][1] = (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2]))/(2*(m_alpha[0] + 2)) ;
+	std::cout << "[UPDATE DTFL] Determinant of D: " << -2 * m_zeta * (pow(cos( m_robotOrientation[2]),2) + pow(sin( m_robotOrientation[2]),2)) ;
 	m_lf2[0] = 2 * m_zeta * m_zeta ;
 	m_lf2[1] = (m_lf2[0] * ((pow(m_robotPosition[1],2)*sin(2*m_robotOrientation[2])))/2 + m_robotPosition[0]*m_robotPosition[1]*cos(2*m_robotOrientation[2]) - ((pow(m_robotPosition[0],2)*sin(2*m_robotOrientation[2])))/2)/(m_alpha[0] + 2) ;
 	
