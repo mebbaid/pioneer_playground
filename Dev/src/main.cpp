@@ -70,8 +70,8 @@ int main()
 				    time_t end = time(0);
 				    time_t timeTaken = end - start;
 				    myPioneer.update_dtfl();
-				    v1 = -k2 * myPioneer.m_alpha[0] - k1 * myPioneer.m_alpha[1];
-				    v2 = -k1 * (myPioneer.m_pi[1]-0.2); // assign a velocity on the path
+				    v1 = - 10* k2 * myPioneer.m_alpha[0] - 10* k1 * myPioneer.m_alpha[1];
+				    v2 = -k1 * (myPioneer.m_pi[1] - 0.2); // assign a velocity on the path
 				    u1 = myPioneer.m_Di[0][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[0][1]	* (v2 - myPioneer.m_lf2[1]) ; 
 				    u1 = myPioneer.m_Di[1][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[1][1]	* (v2 - myPioneer.m_lf2[1]) ;  
 				    control = myPioneer.controlTx_dtfl(u1,u2);
