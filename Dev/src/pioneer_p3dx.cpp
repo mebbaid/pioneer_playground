@@ -86,12 +86,42 @@ bool pioneer_p3dx::update_fblinearization(const float b) {
 	return true;
 }
 
+bool pioneer_p3dx::update_tfl() {
+
+	if (simxGetObjectPosition(m_clientID, m_robotHandle, -1, m_robotPosition, simx_opmode_buffer) != simx_return_ok) {
+		std::cout << "[UPDATE] robot position not retireved" << std::endl;
+		return false;
+	}
+	if (simxGetObjectOrientation(m_clientID, m_robotHandle, -1, m_robotOrientation, simx_opmode_buffer) != simx_return_ok) {
+		std::cout << "[UPDATE] robot orientation not retireved" << std::endl;
+		return false;
+	}
+	if (simxGetObjectPosition(m_clientID, m_pathHandle, -1, m_pathPosition, simx_opmode_buffer) != simx_return_ok) {
+		std::cout << "[UPDATE] path position not retireved" << std::endl;
+		return false;
+	}
+	m_alpha[0] = (m_robotPosition[0]*m_robotPosition[0]) + (m_robotPosition[1]*m_robotPosition[1]) - 2 ;
+	m_alpha[1] = 2 * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin( m_robotOrientation[2])) ;
+	return true;
+}
+
 float* pioneer_p3dx::controlTx(float u1, float u2, const float b) {
 	float m_theta = m_robotOrientation[2];
 	std::cout << "[controlTX] robot orientation " << m_robotOrientation[2]<< std::endl;
 	float v = cos(m_theta) * u1 + sin(m_theta) * u2;
 	float w = -(u1 / b )*sin(m_theta)  + (u2 / b)*cos(m_theta) ;
 	//float dw = (w - m_robotAngVelocity[2]) / m_simPeriod;
+	const float l = 0.35, r = 0.1;
+	m_control[0] = (v + 0.5*l*w)/r; // l = 0.35 is the distance between the wheels, r is radius
+	m_control[1] = (v - 0.5*l*w)/r;
+
+	return m_control;
+}
+
+float* pioneer_p3dx::controlTx_tfl(float u1, float u2) {
+	float m_theta = m_robotOrientation[2];
+	float v = u1;
+	float w = u2 ;
 	const float l = 0.35, r = 0.1;
 	m_control[0] = (v + 0.5*l*w)/r; // l = 0.35 is the distance between the wheels, r is radius
 	m_control[1] = (v - 0.5*l*w)/r;
