@@ -9,12 +9,14 @@
 enum string_code {
 	    TFL,
 	    DTFL,
+	    Option_Invalid,
 };
 
 
 string_code hashit (std::string const& inString) {
 	    if (inString == "TFL") return TFL;
 	    if (inString == "DTFL") return DTFL;
+	    return Option_Invalid;
 }
 
 int main()
@@ -30,14 +32,11 @@ int main()
     std::string controller;
     std::cout << "Please insert simulation duration time in seconds\n"; 
     std::cin >> simTime ;
-    std::cout << "Controller type: <FL/TFL/DTFL>\n";
+    std::cout << "Controller type: <TFL/DTFL>\n";
     std::getline(std::cin, controller) ;
     if (!std::getline(std::cin, controller)) { 
-	std::cout << "WARNING: Default feedback linearization controller will be used" << std::endl;
-	std::cout << "Please insert b [suggestion 0.2]" << std::endl;
-	std::cin >> b ;
+	std::cout << "[WARNING] Default feedback linearization controller will be used" << std::endl;
     }
-
     pioneer_p3dx myPioneer;
     if (myPioneer.configure()) {
         std::cout << "Connection established with vrep" << std::endl;
@@ -45,7 +44,7 @@ int main()
         time_t start = time(0);  // Make the start time absolute and outside the loop
         int    timeLeft = simTime;       // timeLeft is a relative value that can be negative => `int`
         simxSynchronousTrigger(myPioneer.m_clientID);
-	
+	    
 	    switch (hashit(controller)) {
 			case TFL : { 
 			 std::cout << "Simulating TFL over a circle" << std::endl; 
@@ -60,8 +59,8 @@ int main()
 				    control = myPioneer.controlTx_tfl(u1,u2);
 				    myPioneer.move(*(control), *(control+1));
 				    timeLeft = simTime - timeTaken ;
-			 	   }
-			  } 
+			 	   } break ;
+			  }  
 			
 			case DTFL: { 
 			  std::cout << "Simulating DTFL over a circle" << std::endl;	
@@ -78,12 +77,12 @@ int main()
 				    control = myPioneer.controlTx_dtfl(u1,u2);
 				    myPioneer.move(*(control), *(control+1));
 				    timeLeft = simTime - timeTaken ;
-			 	   }    
+			 	   }   break ; 
 			} 
 
-			default: {  
+			default : {  
 			  std::cout << "[DEFAULT] Please insert b [suggestion 0.2]" << std::endl;
-			  std::cin >> b ;  std::cout << "b is " << b << std::endl;
+			  std::cin >> b ; 
 			  while (timeLeft > 0 )
 				   {
 				    simxSynchronousTrigger(myPioneer.m_clientID); 
@@ -97,8 +96,8 @@ int main()
 				    control = myPioneer.controlTx(u1, u2, b);
 				    myPioneer.move(*(control), *(control + 1));
 				    timeLeft = simTime - timeTaken;
-				  }
-		       }	      
+				  } break ;
+		       } 	      
 	    }
 	myPioneer.close();	
     }	      
