@@ -9,14 +9,12 @@
 enum string_code {
 	    TFL,
 	    DTFL,
-	    FL,
 };
 
 
 string_code hashit (std::string const& inString) {
 	    if (inString == "TFL") return TFL;
 	    if (inString == "DTFL") return DTFL;
-	    if (inString == "FL") return FL;
 }
 
 int main()
@@ -32,14 +30,13 @@ int main()
     std::string controller;
     std::cout << "Please insert simulation duration time in seconds\n"; 
     std::cin >> simTime ;
-    std::cout << "Controller type: <TFL/DTFL>\n";
+    std::cout << "Controller type: <FL/TFL/DTFL>\n";
     std::getline(std::cin, controller) ;
     if (!std::getline(std::cin, controller)) { 
 	std::cout << "WARNING: Default feedback linearization controller will be used" << std::endl;
 	std::cout << "Please insert b [suggestion 0.2]" << std::endl;
 	std::cin >> b ;
     }
-    std::cout << "Controller is: " << controller << "\n";
 
     pioneer_p3dx myPioneer;
     if (myPioneer.configure()) {
@@ -54,6 +51,7 @@ int main()
 			 std::cout << "Simulating TFL over a circle" << std::endl; 
 			 while (timeLeft > 0 )
 				   {
+				    simxSynchronousTrigger(myPioneer.m_clientID);
 				    time_t end = time(0);
 				    time_t timeTaken = end - start;
 				    myPioneer.update_tfl();
@@ -62,17 +60,14 @@ int main()
 				    control = myPioneer.controlTx_tfl(u1,u2);
 				    myPioneer.move(*(control), *(control+1));
 				    timeLeft = simTime - timeTaken ;
-				    simxSynchronousTrigger(myPioneer.m_clientID);	
 			 	   }
-			  	myPioneer.close();
 			  } 
 			
-			break ;
-
 			case DTFL: { 
 			  std::cout << "Simulating DTFL over a circle" << std::endl;	
 			  while (timeLeft > 0 )
 				   {
+				    simxSynchronousTrigger(myPioneer.m_clientID);	
 				    time_t end = time(0);
 				    time_t timeTaken = end - start;
 				    myPioneer.update_dtfl();
@@ -83,19 +78,17 @@ int main()
 				    control = myPioneer.controlTx_dtfl(u1,u2);
 				    myPioneer.move(*(control), *(control+1));
 				    timeLeft = simTime - timeTaken ;
-				    simxSynchronousTrigger(myPioneer.m_clientID);	
-			 	   }
-			  	myPioneer.close();	    
+			 	   }    
 			} 
-			break ;
 
-			case : FL {
+			default: {  
+			  std::cout << "[DEFAULT] Please insert b [suggestion 0.2]" << std::endl;
+			  std::cin >> b ;  std::cout << "b is " << b << std::endl;
 			  while (timeLeft > 0 )
 				   {
+				    simxSynchronousTrigger(myPioneer.m_clientID); 
 				    time_t end = time(0);
 				    time_t timeTaken = end - start;
-				    std::cout << "Please insert b [suggestion 0.2]" << std::endl;
-				    std::cin >> b ;
 				    myPioneer.update_fblinearization(b);
 				    e1[0] =  myPioneer.m_robotPosition[0] - myPioneer.m_pathPosition[0] ;
 				    e1[1] =  myPioneer.m_robotPosition[1] - myPioneer.m_pathPosition[1] ;
@@ -103,13 +96,11 @@ int main()
 				    u2 = k2*(myPioneer.m_pathlinVelocity[1] - myPioneer.m_robotlinVelocity[1])  - k2 * e1[1];
 				    control = myPioneer.controlTx(u1, u2, b);
 				    myPioneer.move(*(control), *(control + 1));
-				    //myPioneer.move(u2, u1);
 				    timeLeft = simTime - timeTaken;
-				    simxSynchronousTrigger(myPioneer.m_clientID); 
 				  }
-			    myPioneer.close();	
 		       }	      
 	    }
+	myPioneer.close();	
     }	      
     return 0;
 }
