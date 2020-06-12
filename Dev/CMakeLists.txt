@@ -30,6 +30,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   $ENV{REMOTE_API}/include
   $ENV{REMOTE_API}/remoteApi
+  $ENV{EIGEN}
 )
 
 

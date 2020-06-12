@@ -73,7 +73,7 @@ int main()
 				    v1 = - 10* k2 * myPioneer.m_alpha[0] - 10* k1 * myPioneer.m_alpha[1];
 				    v2 = -k1 * (myPioneer.m_pi[1] - 0.2); // assign a velocity on the path
 				    u1 = myPioneer.m_Di[0][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[0][1]	* (v2 - myPioneer.m_lf2[1]) ; 
-				    u1 = myPioneer.m_Di[1][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[1][1]	* (v2 - myPioneer.m_lf2[1]) ;  
+				    u2 = myPioneer.m_Di[1][0]*(v1- myPioneer.m_lf2[0]) + myPioneer.m_Di[1][1]	* (v2 - myPioneer.m_lf2[1]) ;  
 				    control = myPioneer.controlTx_dtfl(u1,u2);
 				    myPioneer.move(*(control), *(control+1));
 				    timeLeft = simTime - timeTaken ;

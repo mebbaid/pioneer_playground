@@ -1,5 +1,7 @@
 #include<extApi.h>
 #include<math.h>
+#include<Eigen/Dense>
+
 class pioneer_p3dx
 {
 public:
@@ -29,10 +31,10 @@ public:
 	simxFloat m_desiredrightvelocity;
 	simxFloat m_alpha[2];  // dummy output corresponding to path
 	simxFloat m_pi[2];    // dummy output on the path
-	simxFloat m_lf2[2];   // 2nd lie derivative of h to be compensated by the dtfl feedback 
 	simxFloat m_zeta;  // new state for dyn. extension
-	simxFloat m_Di [2][2] ; //inverse of decoupling matrix
-
+	Eigen::Matrix<float,2,2> m_D; //Decoupling matrix
+	Eigen::Matrix<float,2,2> m_Di; //inverse of decoupling matrix
+	Eigen::Vector2f m_lf2;   // 2nd lie derivative of h to be compensated by the dtfl feedback 
 
 	bool configure();	// establish the connection and retrieve handles
 	bool update_fblinearization(const float b);		// main function updating robot state
