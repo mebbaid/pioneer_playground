@@ -30,6 +30,8 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   $ENV{REMOTE_API}/include
   $ENV{REMOTE_API}/remoteApi
+  $ENV{EIGEN}
+  $ENV{inih}/include/inih
 )
 
 
@@ -46,5 +48,7 @@ foreach(dir ${dirs})
 endforeach()
 
 target_link_libraries(${EXE_TARGET_NAME} Threads::Threads)
+target_link_libraries(${EXE_TARGET_NAME} $ENV{inih}/lib/libinihcpp.a)
 
-install(TARGETS ${EXE_TARGET_NAME} DESTINATION bin)
+install(TARGETS ${EXE_TARGET_NAME} DESTINATION ${CMAKE_BUILD_TYPE}/bin)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/App/conf.ini DESTINATION ${CMAKE_BUILD_TYPE}/bin)
