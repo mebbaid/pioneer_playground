@@ -6,6 +6,7 @@
 #include <chrono>
 #include <thread>
 #include "pioneer_p3dx.h"
+#include "INIReader.h"
 
 enum string_code {
 	TFL,
@@ -20,20 +21,27 @@ string_code hashit(std::string const& inString) {
 	return Option_Invalid;
 }
 
+
 int main()
 {
-	//std::chrono::seconds dura(5);
+	INIReader reader("conf.ini");
+    	if (reader.ParseError() != 0) {
+		std::cout << "Can't load conf.ini'\n";
+		return 1;
+    	}
 	std::cout << "Hello World!\n";
 	float* control;
 	float* states;
 	float u1, u2, v1, v2;   //initial controls
 	time_t  simTime;
-	float b, k1 = 2, k2 = 3;
+	float b;
+	float k1 = reader.GetInteger("user", "k1", -1), k2 = reader.GetInteger("user", "k2", -1);
+	float l = reader.GetReal("pioneer", "length", -1), r = reader.GetReal("pioneer", "radius", -1) ;
 	float e1[2];
 	std::string controller;
 	std::cout << "Please insert simulation duration time in seconds\n";
 	std::cin >> simTime;
-	std::cout << "Controller type: <TFL/DTFL>\n";
+	std::cout << "Controller type: <FL/TFL/DTFL>\n";
 	std::getline(std::cin, controller);
 	if (!std::getline(std::cin, controller)) {
 		std::cout << "[WARNING] Default feedback linearization controller will be used" << std::endl;
@@ -57,7 +65,7 @@ int main()
 				myPioneer.update_tfl();
 				u1 = 0.2;
 				u2 = -k2 * myPioneer.m_alpha[0] - k1 * myPioneer.m_alpha[1];
-				control = myPioneer.controlTx_tfl(u1, u2);
+				control = myPioneer.controlTx_tfl(u1, u2, l, r);
 				myPioneer.move(*(control), *(control + 1));
 				timeLeft = simTime - timeTaken;
 			} break;
@@ -73,14 +81,14 @@ int main()
 				time_t end = time(0);
 				time_t timeTaken = end - start;
 				myPioneer.update_dtfl();
-				v1 = -k2 * myPioneer.m_alpha[0] - k1 * myPioneer.m_alpha[1];
-				v2 = -k1 * (myPioneer.m_pi[1] - myPioneer.m_pi_des[1]);
+				v1 = - k2 * myPioneer.m_alpha[0] - k1 * myPioneer.m_alpha[1];
+				v2 = - k1 * (myPioneer.m_pi[1] - myPioneer.m_pi_des[1]);
 				b << v1, v2;
 				myPioneer.m_Di = myPioneer.m_D.completeOrthogonalDecomposition().pseudoInverse();
 				cnt = myPioneer.m_Di * (b - myPioneer.m_lf2);
 				u1 = cnt(0);
 				u2 = cnt(1);
-				control = myPioneer.controlTx_dtfl(u1, u2);
+				control = myPioneer.controlTx_dtfl(u1, u2, l ,r);
 				myPioneer.move(*(control), *(control + 1));
 				timeLeft = simTime - timeTaken;
 			}   break;
@@ -99,7 +107,7 @@ int main()
 				e1[1] = myPioneer.m_robotPosition[1] - myPioneer.m_pathPosition[1];
 				u1 = k1 * (myPioneer.m_pathlinVelocity[0] - myPioneer.m_robotlinVelocity[0]) - k1 * e1[0];
 				u2 = k2 * (myPioneer.m_pathlinVelocity[1] - myPioneer.m_robotlinVelocity[1]) - k2 * e1[1];
-				control = myPioneer.controlTx(u1, u2, b);
+				control = myPioneer.controlTx(u1, u2, b, l, r);
 				myPioneer.move(*(control), *(control + 1));
 				timeLeft = simTime - timeTaken;
 			} break;

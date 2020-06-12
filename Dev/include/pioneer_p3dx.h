@@ -3,6 +3,7 @@
 #include<Eigen/Dense>
 
 
+
 class pioneer_p3dx
 {
 public:
@@ -12,7 +13,7 @@ public:
 	const simxInt m_conntimeout = 5000;
 	const simxInt m_connThreadcycle = 5;
 	const simxFloat m_simPeriod = 0.005; // vrep sim period 
-	const simxFloat m_intPeriod = 1e-04;
+	//const simxFloat m_intPeriod = 1e-04;
 	simxInt m_robotHandle;
 	simxInt m_pathHandle;
 	simxInt m_leftMotorHandle;
@@ -44,9 +45,9 @@ public:
 	bool update_fblinearization(const float b);		// main function updating robot state
 	bool update_tfl();
 	bool update_dtfl();
-	simxFloat* controlTx(float u1, float u2, const float b);  // To convert (u,w) -> (u1,u2)
-	simxFloat* controlTx_tfl(float u1, float u2);
-	simxFloat* controlTx_dtfl(float u1, float u2);
+	simxFloat* controlTx(float u1, float u2, float b, float l, float r) ;  // To convert (u,w) -> (u1,u2)
+	simxFloat* controlTx_tfl(float u1, float u2, float l, float r) ;
+	simxFloat* controlTx_dtfl(float u1, float u2, float l, float r) ;
 	bool move(simxFloat m_desiredrightvelocity, simxFloat m_desiredleftvelocity);
 	//float* statesTx(float b, float x, float y, float theta);
 	bool close();		// close connection and simulation
