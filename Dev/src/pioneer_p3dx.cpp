@@ -176,10 +176,7 @@ float* pioneer_p3dx::controlTx_tfl(float u1, float u2) {
 }
 
 float* pioneer_p3dx::controlTx_dtfl(float u1, float u2) {
-	for (size_t i = 0; i < 100; i++)
-	{
-		m_zeta = m_zeta + m_intPeriod * u1;
-	}
+	m_zeta = m_zeta + m_simPeriod * u1 ;
 	float v = m_zeta;
 	float w = u2;
 	const float l = 0.35, r = 0.1;

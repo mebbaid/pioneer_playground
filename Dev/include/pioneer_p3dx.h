@@ -11,7 +11,7 @@ public:
 	const simxInt m_connPort = 20000;
 	const simxInt m_conntimeout = 5000;
 	const simxInt m_connThreadcycle = 5;
-	const simxFloat m_simPeriod = 0.005; // vrep sim period ms
+	const simxFloat m_simPeriod = 0.005; // vrep sim period 
 	const simxFloat m_intPeriod = 1e-04;
 	simxInt m_robotHandle;
 	simxInt m_pathHandle;
