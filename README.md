@@ -29,7 +29,7 @@ See how to edit system `Env` variables in `Windows` [here](https://appuals.com/h
 ## Linux
 
 ```sh
-git clone https://github.com/robotology/pioneer_playground.git
+git clone https://github.com/mebbaid/pioneer_playground.git
 cd pioneer_playground
 mkdir build && cd build
 cmake ../
