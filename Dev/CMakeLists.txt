@@ -56,8 +56,17 @@ endif (UNIX)
 
 if (MSVC)
 target_link_libraries(${EXE_TARGET_NAME} $ENV{inih}/lib/inihcpp.lib)  
-install(TARGETS ${EXE_TARGET_NAME} DESTINATION bin)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/App/conf.ini DESTINATION bin)  
+install(TARGETS ${EXE_TARGET_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/App/conf.ini DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+add_custom_command(TARGET ${EXE_TARGET_NAME} POST_BUILD
+                   COMMAND if $<CONFIG:Debug> neq 0 ("${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/App/conf.ini" "$<TARGET_FILE_DIR:${EXE_TARGET_NAME}>")
+                   COMMAND if $<CONFIG:Release> neq 0 ("${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/App/conf.ini" "$<TARGET_FILE_DIR:${EXE_TARGET_NAME}>")
+		   COMMENT "Copying config file"
+)
+
+
 endif (MSVC)
+
 
 
