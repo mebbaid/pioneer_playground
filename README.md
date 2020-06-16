@@ -46,7 +46,7 @@ Follow the same instructions from the Powershell. One can also opt to use the ``
 
 2. Run 
 ```sh
-cd $/path/where/you/unpacked
+cd $/path/where/you/installed
 pioneer_SDTFL config.ini
 ```
 3. Follow instructions and select the controller you want to simulate.
