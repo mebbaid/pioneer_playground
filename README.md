@@ -5,7 +5,7 @@
  - [:page_facing_up: Dependencies](#page_facing_up-dependencies)
 
 # :orange_book: The general idea
-This repo tests feedback linearization, transverse feedback linearization and dynamic transverse feedback linearization for the purpose of allowing the pioneer_p3dx robot to follow a given path.
+This repo tests feedback linearization, transverse feedback linearization and dynamic transverse feedback linearization for the purpose of allowing the pioneer_p3dx robot to follow a given path (a circle).
 It also tests those controllers when sampling is considered, and compare the results to emulation.
 
 
