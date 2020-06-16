@@ -51,7 +51,7 @@ bool pioneer_p3dx::configure() {
 	if (simxGetObjectOrientation(m_clientID, m_robotHandle, -1, m_robotOrientation, simx_opmode_streaming) != simx_return_ok) {
 		std::cout << "[CONFIG] Error retrieving robot orientation" << std::endl;
 		//return false;
-	}	
+	}
 	if (simxSynchronous(m_clientID, 1) != simx_return_ok) {
 		std::cout << "[CONFIG] unable to start synchornous mode " << std::endl;
 		return false;
@@ -128,33 +128,33 @@ bool pioneer_p3dx::update_dtfl() {
 		return false;
 	}
 	//m_zeta = pow((pow(m_robotlinVelocity[0],2)+pow(m_robotlinVelocity[1],2)),0.5); // TODO test if this takes the previous value of v
-	m_alpha[0] = pow(m_robotPosition[0],2) + pow(m_robotPosition[1],2) - 2;
+	m_alpha[0] = pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2) - 2;
 	m_alpha[1] = 2 * m_zeta * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin(m_robotOrientation[2]));
 	m_pi[0] = atan2(m_robotPosition[1], m_robotPosition[0]);
 	m_pi[1] = (-m_zeta * (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2]))) / (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2));
 	m_pi_des[0] = atan2(m_pathPosition[1], m_pathPosition[0]);
 	m_pi_des[1] = 0.1; // desired speed on path
-	
-	m_D(0,0) = 2 * m_robotPosition[0] * cos(m_robotOrientation[2]) + 2 * m_robotPosition[1] * sin(m_robotOrientation[2]);
-	m_D(0,1) = 2 * m_zeta * (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2]));
-	m_D(1,0) = -(m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2]))/(pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2));
-	m_D(1,1) = (m_zeta * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin(m_robotOrientation[2]))) / (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2));
+
+	m_D(0, 0) = 2 * m_robotPosition[0] * cos(m_robotOrientation[2]) + 2 * m_robotPosition[1] * sin(m_robotOrientation[2]);
+	m_D(0, 1) = 2 * m_zeta * (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2]));
+	m_D(1, 0) = -(m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2])) / (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2));
+	m_D(1, 1) = (m_zeta * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin(m_robotOrientation[2]))) / (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2));
 
 	//m_Di[0][0] = (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin(m_robotOrientation[2])) / (2 * (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2)));
 	//m_Di[0][1] = m_robotPosition[0] * sin(m_robotOrientation[2]) - m_robotPosition[1] * cos(m_robotOrientation[2]);
 	//m_Di[1][0] = (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2])) / (2 * m_zeta * (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2)));
 	//m_Di[1][1] = (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin(m_robotOrientation[2]))/m_zeta;
-	
-	m_lf2(0) = 2 * pow(m_zeta,2);
-	m_lf2(1) = (2 * pow(m_zeta, 2) * (pow(m_robotPosition[1], 2) * sin(2 * m_robotOrientation[2])) / 2 + m_robotPosition[0] * m_robotPosition[1] * cos(2 * m_robotOrientation[2]) - (pow(m_robotPosition[0], 2) * sin(2 * m_robotOrientation[2])) / 2) / (pow((pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2)),2));
-	
-	std::cout << "[UPDATE DTFL] Vel along path " << m_pi[1] << std::endl;	
-	
+
+	m_lf2(0) = 2 * pow(m_zeta, 2);
+	m_lf2(1) = (2 * pow(m_zeta, 2) * (pow(m_robotPosition[1], 2) * sin(2 * m_robotOrientation[2])) / 2 + m_robotPosition[0] * m_robotPosition[1] * cos(2 * m_robotOrientation[2]) - (pow(m_robotPosition[0], 2) * sin(2 * m_robotOrientation[2])) / 2) / (pow((pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2)), 2));
+
+	std::cout << "[UPDATE DTFL] Vel along path " << m_pi[1] << std::endl;
+
 	return true;
 }
 
 
-float* pioneer_p3dx::controlTx(float u1, float u2,float b,  float l, float r)  {
+float* pioneer_p3dx::controlTx(float u1, float u2, float b, float l, float r) {
 	float m_theta = m_robotOrientation[2];
 	std::cout << "[controlTX] robot orientation " << m_robotOrientation[2] << std::endl;
 	float v = cos(m_theta) * u1 + sin(m_theta) * u2;
@@ -166,7 +166,7 @@ float* pioneer_p3dx::controlTx(float u1, float u2,float b,  float l, float r)  {
 	return m_control;
 }
 
-float* pioneer_p3dx::controlTx_tfl(float u1, float u2, float l, float r)  {
+float* pioneer_p3dx::controlTx_tfl(float u1, float u2, float l, float r) {
 	float v = u1;
 	float w = u2;
 	m_control[0] = (v + 0.5 * l * w) / r; // l = 0.35 is the distance between the wheels, r is radius
@@ -176,7 +176,7 @@ float* pioneer_p3dx::controlTx_tfl(float u1, float u2, float l, float r)  {
 }
 
 float* pioneer_p3dx::controlTx_dtfl(float u1, float u2, float l, float r) {
-	m_zeta = m_zeta + m_simPeriod * u1 ;
+	m_zeta = m_zeta + m_simPeriod * u1;
 	float v = m_zeta;
 	float w = u2;
 	m_control[0] = (v + 0.5 * l * w) / r; // l = 0.35 is the distance between the wheels, r is radius
