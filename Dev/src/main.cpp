@@ -26,9 +26,9 @@ int main()
 {
 	INIReader reader("conf.ini");
     	if (reader.ParseError() != 0) {
-		std::cout << "Can't load conf.ini'\n";
+		std::cout << "[Error] Can't load conf.ini'\n";
 		return 1;
-    	}
+    }
 	std::cout << "Hello World!\n";
 	float* control;
 	float* states;
