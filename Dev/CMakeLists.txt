@@ -1,4 +1,4 @@
-# Authors: Mohamed Elobaid	
+# Authors: Mohamed Elobaid (2020)
 
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 14)
@@ -6,9 +6,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 project(pioneer_p3dx_SDLTFL)
 
-
 find_package(Threads REQUIRED)
-
 
 set(EXE_TARGET_NAME pioneer_SDTFL)
 
@@ -64,7 +62,6 @@ add_custom_command(TARGET ${EXE_TARGET_NAME} POST_BUILD
                    COMMAND if $<CONFIG:Release> neq 0 ("${CMAKE_COMMAND}" -E copy "${CMAKE_CURRENT_SOURCE_DIR}/App/conf.ini" "$<TARGET_FILE_DIR:${EXE_TARGET_NAME}>")
 		   COMMENT "Copying config file"
 )
-
 
 endif (MSVC)
 

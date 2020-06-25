@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include "pioneer_p3dx.h"
 
@@ -127,13 +128,21 @@ bool pioneer_p3dx::update_dtfl() {
 		std::cout << "[UPDATE DTFL] robot velocity not retireved" << std::endl;
 		return false;
 	}
+	if (simxGetObjectVelocity(m_clientID, m_pathHandle, m_pathlinVelocity, m_pathAngVelocity, simx_opmode_oneshot_wait) != simx_return_ok) {
+		std::cout << "[UPDATE DTFL] robot velocity not retireved" << std::endl;
+		return false;
+	}
+
 	//m_zeta = pow((pow(m_robotlinVelocity[0],2)+pow(m_robotlinVelocity[1],2)),0.5); // TODO test if this takes the previous value of v
 	m_alpha[0] = pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2) - 2;
 	m_alpha[1] = 2 * m_zeta * (m_robotPosition[0] * cos(m_robotOrientation[2]) + m_robotPosition[1] * sin(m_robotOrientation[2]));
 	m_pi[0] = atan2(m_robotPosition[1], m_robotPosition[0]);
 	m_pi[1] = (-m_zeta * (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2]))) / (pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2));
 	m_pi_des[0] = atan2(m_pathPosition[1], m_pathPosition[0]);
-	m_pi_des[1] = 0.1; // desired speed on path
+	//m_pi_des[1] = 0.1; // desired speed on path
+	m_pi_des[1] = pow((pow(m_pathlinVelocity[0],2)+pow(m_pathlinVelocity[1],2)), 0.5); // linear velocity of path
+
+	std::cout << "[UPDATE DTFL] robot velocity is : " << m_pi[1] << std::endl;
 
 	m_D(0, 0) = 2 * m_robotPosition[0] * cos(m_robotOrientation[2]) + 2 * m_robotPosition[1] * sin(m_robotOrientation[2]);
 	m_D(0, 1) = 2 * m_zeta * (m_robotPosition[1] * cos(m_robotOrientation[2]) - m_robotPosition[0] * sin(m_robotOrientation[2]));
@@ -148,8 +157,6 @@ bool pioneer_p3dx::update_dtfl() {
 	m_lf2(0) = 2 * pow(m_zeta, 2);
 	m_lf2(1) = (2 * pow(m_zeta, 2) * (pow(m_robotPosition[1], 2) * sin(2 * m_robotOrientation[2])) / 2 + m_robotPosition[0] * m_robotPosition[1] * cos(2 * m_robotOrientation[2]) - (pow(m_robotPosition[0], 2) * sin(2 * m_robotOrientation[2])) / 2) / (pow((pow(m_robotPosition[0], 2) + pow(m_robotPosition[1], 2)), 2));
 
-	std::cout << "[UPDATE DTFL] Vel along path " << m_pi[1] << std::endl;
-
 	return true;
 }
 
@@ -159,7 +166,6 @@ float* pioneer_p3dx::controlTx(float u1, float u2, float b, float l, float r) {
 	std::cout << "[controlTX] robot orientation " << m_robotOrientation[2] << std::endl;
 	float v = cos(m_theta) * u1 + sin(m_theta) * u2;
 	float w = -(u1 / b) * sin(m_theta) + (u2 / b) * cos(m_theta);
-	//float dw = (w - m_robotAngVelocity[2]) / m_simPeriod;
 	m_control[0] = (v + 0.5 * l * w) / r; // l = 0.35 is the distance between the wheels, r is radius
 	m_control[1] = (v - 0.5 * l * w) / r;
 

@@ -34,7 +34,7 @@ int main()
 	float* states;
 	float u1, u2, v1, v2;   //initial controls
 	time_t  simTime;
-	float b;
+	float b = reader.GetReal("user","b", -1);
 	float k1 = reader.GetInteger("user", "k1", -1), k2 = reader.GetInteger("user", "k2", -1);
 	float l = reader.GetReal("pioneer", "length", -1), r = reader.GetReal("pioneer", "radius", -1);
 	float e1[2];
@@ -73,7 +73,7 @@ int main()
 
 		case DTFL: {
 			std::cout << "Simulating DTFL over a circle" << std::endl;
-			Eigen::Vector2f b; // performing a least square solution to find inverse of D
+			Eigen::Vector2f V; // 
 			Eigen::Vector2f cnt;
 			while (timeLeft > 0)
 			{
@@ -82,10 +82,11 @@ int main()
 				time_t timeTaken = end - start;
 				myPioneer.update_dtfl();
 				v1 = -k2 * myPioneer.m_alpha[0] - k1 * myPioneer.m_alpha[1];
-				v2 = -k1 * (myPioneer.m_pi[1] - myPioneer.m_pi_des[1]);
-				b << v1, v2;
+				//v2 = -k1 * (myPioneer.m_pi[1] - myPioneer.m_pi_des[1]) -k2 * (myPioneer.m_pi[0] - myPioneer.m_pi_des[0]);
+				v2 =  -k2 * (myPioneer.m_pi[1] - myPioneer.m_pi_des[1]);
+				V << v1, v2;
 				myPioneer.m_Di = myPioneer.m_D.completeOrthogonalDecomposition().pseudoInverse();
-				cnt = myPioneer.m_Di * (b - myPioneer.m_lf2);
+				cnt = myPioneer.m_Di * (V - myPioneer.m_lf2);
 				u1 = cnt(0);
 				u2 = cnt(1);
 				control = myPioneer.controlTx_dtfl(u1, u2, l, r);
@@ -95,8 +96,7 @@ int main()
 		}
 
 		default: {
-			std::cout << "[DEFAULT] Please insert b [suggestion 0.2]" << std::endl;
-			std::cin >> b;
+			std::cout << "[DEFAULT] Feedback linearization with b = " << b << std::endl;
 			while (timeLeft > 0)
 			{
 				simxSynchronousTrigger(myPioneer.m_clientID);
