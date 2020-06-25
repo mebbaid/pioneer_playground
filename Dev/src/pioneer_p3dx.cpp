@@ -129,7 +129,7 @@ bool pioneer_p3dx::update_dtfl() {
 		return false;
 	}
 	if (simxGetObjectVelocity(m_clientID, m_pathHandle, m_pathlinVelocity, m_pathAngVelocity, simx_opmode_oneshot_wait) != simx_return_ok) {
-		std::cout << "[UPDATE DTFL] robot velocity not retireved" << std::endl;
+		std::cout << "[UPDATE DTFL] path velocity not retireved" << std::endl;
 		return false;
 	}
 
